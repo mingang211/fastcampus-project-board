@@ -10,8 +10,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("testdb")
@@ -54,9 +52,10 @@ class JpaRepositoryTest {
     void givenTestData_WhenInserting_thenWorksFine(){
         //Give
         Long previousCount = articleRepository.count();
+        UserAccount userAccount = userAccountRepository.save(UserAccount.of("newUno", "pw", null, null, null));
 
         //When
-        Article savedArticle = articleRepository.save(Article.of("new article", "new content", "#spring"));
+        Article savedArticle = articleRepository.save(Article.of(userAccount,"new article", "new content", "#spring"));
 
         //Then
         assertThat(articleRepository.count()).isEqualTo(previousCount + 1);

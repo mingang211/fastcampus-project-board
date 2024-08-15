@@ -38,7 +38,7 @@ class ArticleCommentServiceTest {
         //given
         Long articleId = 1L;
         given(articleRepository.findById(articleId)).willReturn(Optional.of(
-                Article.of("title","content","#hastag")));
+                Article.of(null,"title","content","#hastag")));
 
         //when
         List<ArticleCommentDto> articleComments = sut.searchArticleComment(1L);

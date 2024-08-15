@@ -67,7 +67,7 @@ class ArticleServiceTest {
         then(articleRepository).should().save(any(Article.class));
 
     }
-    @DisplayName("게시글 스장 정보를 입력하면, 게시글을 수정한다.")
+    @DisplayName("게시글 수정 정보를 입력하면, 게시글을 수정한다.")
     @Test
     void giveArticleIdAndModifiedInfo_whenUpdatingArticle_thenUpdateArticle() {
         //give
