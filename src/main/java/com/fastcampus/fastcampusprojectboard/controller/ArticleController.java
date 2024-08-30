@@ -1,27 +1,45 @@
 package com.fastcampus.fastcampusprojectboard.controller;
 
+import com.fastcampus.fastcampusprojectboard.domain.type.SearchType;
+import com.fastcampus.fastcampusprojectboard.dto.response.ArticleResponse;
+import com.fastcampus.fastcampusprojectboard.dto.response.ArticleWithCommentsResponse;
+import com.fastcampus.fastcampusprojectboard.service.ArticleService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RequestMapping("/articles")
 @Controller
 public class ArticleController {
 
+    private final ArticleService articleService;
+
+    public ArticleController(ArticleService articleService) {
+        this.articleService = articleService;
+    }
+
     @GetMapping
-    public String articles(ModelMap map) {
-        map.addAttribute("articles", List.of());
+    public String articles(
+            @RequestParam(required = false) SearchType searchType,
+            @RequestParam(required = false) String searchValue,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            ModelMap map) {
+        map.addAttribute("articles", articleService.searchArticles(searchType, searchValue, pageable)
+                .map(ArticleResponse::from));
         return "articles/index";
     }
 
     @GetMapping("/{articleId}")
     public String articles(@PathVariable Long articleId, ModelMap map) {
-        map.addAttribute("article", "article"); // TODO: 구현할 때 실제 데이터를 추가해야함
-        map.addAttribute("articleComments", List.of());
+        ArticleWithCommentsResponse article = ArticleWithCommentsResponse.from(articleService.getArticle(articleId));
+        map.addAttribute("article", article);
+        map.addAttribute("articleComments", article.articleCommentsResponse());
 
         return "articles/detail";
     }
