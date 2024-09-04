@@ -15,7 +15,7 @@ import java.util.Set;
         @Index(columnList = "title"),
         @Index(columnList = "hashtag"),
         @Index(columnList = "createdAt"),
-        @Index(columnList = "createdBy"),
+        @Index(columnList = "createdBy")
 
 })
 
@@ -27,42 +27,35 @@ public class Article extends AuditingFields {
     private Long id;
 
     @Setter
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "userId")
+    private UserAccount userAccount; // 유저 정보 (ID)
+
+    @Setter
     @Column(nullable = false)
-    private String title;
+    private String title; // 제목
     @Setter
     @Column(nullable = false, length = 10000)
-    private String content;
-
+    private String content; // 본문
     @Setter
-    private String hashtag;
-
+    private String hashtag; // 해시태그
     @ToString.Exclude
     @OrderBy("createdAt DESC")
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private final Set<ArticleComment> articleComments = new LinkedHashSet<>();
 
-    @Setter
-    @ManyToOne(optional = false)
-    private UserAccount userAccount;
+    protected Article() {
+    }
 
-    protected Article() {}
-
-    protected Article(UserAccount userAccount, String title, String content, String hashtag) {
+    private Article(UserAccount userAccount, String title, String content, String hashtag) {
         this.userAccount = userAccount;
         this.title = title;
         this.content = content;
         this.hashtag = hashtag;
     }
 
-    /**
-     * 팩토리 메서드를 통해 제공. 도메인 Article을 생성할 때는 title, content, hashtag를 작성해야함.
-     * @param title
-     * @param content
-     * @param hashtag
-     * @return
-     */
     public static Article of(UserAccount userAccount, String title, String content, String hashtag) {
-        return new Article( userAccount, title, content, hashtag);
+        return new Article(userAccount, title, content, hashtag);
     }
 
     @Override
@@ -74,7 +67,7 @@ public class Article extends AuditingFields {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hash(id);
     }
 }
 
