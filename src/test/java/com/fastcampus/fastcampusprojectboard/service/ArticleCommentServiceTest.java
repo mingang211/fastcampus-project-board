@@ -7,6 +7,7 @@ import com.fastcampus.fastcampusprojectboard.dto.ArticleCommentDto;
 import com.fastcampus.fastcampusprojectboard.dto.UserAccountDto;
 import com.fastcampus.fastcampusprojectboard.repository.ArticleCommentRepository;
 import com.fastcampus.fastcampusprojectboard.repository.ArticleRepository;
+import com.fastcampus.fastcampusprojectboard.repository.UserAccountRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,8 @@ class ArticleCommentServiceTest {
     private ArticleCommentRepository articleCommentRepository;
     @Mock
     private ArticleRepository articleRepository;
+    @Mock
+    private UserAccountRepository userAccountRepository;
 
     @DisplayName("게시글 Id로 조회하면 해당하는 댓글리스트를 반환한다.")
     @Test
@@ -57,6 +60,7 @@ class ArticleCommentServiceTest {
         // Given
         ArticleCommentDto dto = createArticleCommentDto("댓글");
         given(articleRepository.getReferenceById(dto.articleId())).willReturn(createArticle());
+        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(createUserAccount());
         given(articleCommentRepository.save(any(ArticleComment.class))).willReturn(null);
 
         // When
@@ -64,6 +68,7 @@ class ArticleCommentServiceTest {
 
         // Then
         then(articleRepository).should().getReferenceById(dto.articleId());
+        then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
         then(articleCommentRepository).should().save(any(ArticleComment.class));
     }
     @DisplayName("댓글 저장을 시도했는데 맞는 게시글이 없으면, 경고 로그를 찍고 아무것도 안 한다.")
@@ -78,6 +83,7 @@ class ArticleCommentServiceTest {
 
         // Then
         then(articleRepository).should().getReferenceById(dto.articleId());
+        then(userAccountRepository).shouldHaveNoInteractions();
         then(articleCommentRepository).shouldHaveNoInteractions();
     }
 
